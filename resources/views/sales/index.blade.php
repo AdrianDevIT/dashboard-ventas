@@ -5,6 +5,13 @@
 @section('content')
     <div class="container">
         <h1>Lista de Ventas</h1>
+        <div class="d-flex flex-column align-items-end gap-2 mb-2">
+            <a href="{{ route('sales.create') }}" class="btn btn-primary">Añadir venta</a>
+            <form action="{{ route('sales.index') }}" method="GET">
+                <input type="text" name="search" placeholder="Buscar por producto" value="{{ request()->get('search') }}">
+                <button type="submit">Buscar</button>
+            </form>
+        </div>
         <table class="table table-striped">
             <thead class="table-dark">
                 <tr>
@@ -37,8 +44,11 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach
-            </tbody>
+                @endforeach                
+            </tbody>            
         </table>
+    </div>
+    <div class="d-flex justify-content-center">
+        {{ $sales->links() }}
     </div>
 @endsection

@@ -4,17 +4,37 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sale;
+use Illuminate\Pagination\Paginator;
 
 class SaleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function __construct()
     {
-        $sales = Sale::all();
+        Paginator::useBootstrap();
+    }
+
+    /*public function index()
+    {
+        $sales = Sale::paginate(10); // Mostrar 10 ventas por página
+        return view('sales.index', compact('sales'));
+    }*/
+
+    public function index(Request $request)
+    {
+        $sales = Sale::query();
+
+        if ($request->filled('search')) {
+            $sales->where('product_name', 'like', '%' . $request->search . '%');
+        }
+
+        $sales = $sales->paginate(10);
+
         return view('sales.index', compact('sales'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -30,20 +50,15 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         // Validar los datos
-        $request->validate([
+        $validated = $request->validate([
             'product_name' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0.01',
             'sale_date' => 'required|date',
         ]);
 
         // Crear y guardar la venta
-        Sale::create([
-            'product_name' => $request->product_name,
-            'quantity' => $request->quantity,
-            'price' => $request->price,
-            'sale_date' => $request->sale_date,
-        ]);
+        Sale::create($validated);
 
         // Redirigir a la lista de ventas
         return redirect()->route('sales.index')->with('success', 'Venta añadida correctamente.');
@@ -71,15 +86,15 @@ class SaleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'product_name' => 'required|string|max:255',
             'quantity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0.01',
             'sale_date' => 'required|date',
         ]);
 
         $sale = Sale::findOrFail($id);
-        $sale->update($request->all());
+        $sale->update($validated);
 
         return redirect()->route('sales.index')->with('success', 'Venta actualizada correctamente.');
     }

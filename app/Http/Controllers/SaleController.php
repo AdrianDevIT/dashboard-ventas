@@ -21,7 +21,7 @@ class SaleController extends Controller
      */
     public function create()
     {
-        //
+        return view('sales.create');
     }
 
     /**
@@ -29,7 +29,24 @@ class SaleController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Validar los datos
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'sale_date' => 'required|date',
+        ]);
+
+        // Crear y guardar la venta
+        Sale::create([
+            'product_name' => $request->product_name,
+            'quantity' => $request->quantity,
+            'price' => $request->price,
+            'sale_date' => $request->sale_date,
+        ]);
+
+        // Redirigir a la lista de ventas
+        return redirect()->route('sales.index')->with('success', 'Venta añadida correctamente.');
     }
 
     /**
@@ -45,7 +62,8 @@ class SaleController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $sale = Sale::findOrFail($id);
+        return view('sales.edit', compact('sale'));
     }
 
     /**
@@ -53,7 +71,17 @@ class SaleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'quantity' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'sale_date' => 'required|date',
+        ]);
+
+        $sale = Sale::findOrFail($id);
+        $sale->update($request->all());
+
+        return redirect()->route('sales.index')->with('success', 'Venta actualizada correctamente.');
     }
 
     /**
@@ -61,6 +89,8 @@ class SaleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $sale = Sale::findOrFail($id);
+        $sale->delete();
+        return redirect()->route('sales.index')->with('success', 'Venta eliminada correctamente.');
     }
 }

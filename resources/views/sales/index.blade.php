@@ -17,18 +17,28 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($sales as $sale)
+                @foreach ($sales as $sale)
                     <tr>
                         <td>{{ $sale->id }}</td>
                         <td>{{ $sale->product_name }}</td>
                         <td>{{ $sale->quantity }}</td>
                         <td>{{ $sale->price }}</td>
-                        <td>{{ $sale->total }}</td>
+                        <td>{{ number_format($sale->quantity * $sale->price, 2) }}</td>
                         <td>{{ $sale->sale_date }}</td>
+                        <td>
+                            <a href="{{ route('sales.edit', $sale->id) }}" class="btn btn-warning">Editar</a>
+                        </td>
+                        <td>
+                            <form action="{{ route('sales.destroy', $sale->id) }}" method="POST"
+                                onsubmit="return confirm('¿Seguro que quieres eliminar esta venta?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Eliminar</button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
 @endsection
-

@@ -5,10 +5,57 @@
 @section('content')
     <div class="container">
         <h1>Lista de Ventas</h1>
+
+        <a href="{{ route('sales.export') }}" class="btn btn-primary mb-2">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+        </a>
+
+        <div class="card mb-4">
+            <div class="card-header">Ventas Diarias</div>
+            <div class="card-body">
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const ctx = document.getElementById('salesChart').getContext('2d');
+                const salesData = @json($salesData);
+
+                const labels = salesData.map(sale => sale.date);
+                const data = salesData.map(sale => sale.total_sales);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Total Vendido (€)',
+                            data: data,
+                            borderColor: 'blue',
+                            backgroundColor: 'rgba(0, 0, 255, 0.2)',
+                            fill: true,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+
+
+
         <div class="d-flex flex-column align-items-end gap-2 mb-2">
             <a href="{{ route('sales.create') }}" class="btn btn-primary">Añadir venta</a>
             <form action="{{ route('sales.index') }}" method="GET">
-                <input type="text" name="search" placeholder="Buscar por producto" value="{{ request()->get('search') }}">
+                <input type="text" name="search" placeholder="Buscar por producto"
+                    value="{{ request()->get('search') }}">
                 <button type="submit">Buscar</button>
             </form>
         </div>
@@ -44,8 +91,8 @@
                             </form>
                         </td>
                     </tr>
-                @endforeach                
-            </tbody>            
+                @endforeach
+            </tbody>
         </table>
     </div>
     <div class="d-flex justify-content-center">

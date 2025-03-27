@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Sale;
 use Illuminate\Pagination\Paginator;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SalesExport;
 
 class SaleController extends Controller
 {
@@ -16,12 +18,6 @@ class SaleController extends Controller
         Paginator::useBootstrap();
     }
 
-    /*public function index()
-    {
-        $sales = Sale::paginate(10); // Mostrar 10 ventas por página
-        return view('sales.index', compact('sales'));
-    }*/
-
     public function index(Request $request)
     {
         $sales = Sale::query();
@@ -32,7 +28,13 @@ class SaleController extends Controller
 
         $sales = $sales->paginate(10);
 
-        return view('sales.index', compact('sales'));
+        // Obtener datos para el gráfico
+        $salesData = Sale::selectRaw('DATE(sale_date) as date, SUM(quantity * price) as total_sales')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        return view('sales.index', compact('sales', 'salesData'));
     }
 
 
@@ -107,5 +109,10 @@ class SaleController extends Controller
         $sale = Sale::findOrFail($id);
         $sale->delete();
         return redirect()->route('sales.index')->with('success', 'Venta eliminada correctamente.');
+    }
+
+    public function export()
+    {
+        return Excel::download(new SalesExport, 'sales.xlsx');
     }
 }

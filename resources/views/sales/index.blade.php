@@ -10,6 +10,38 @@
             <i class="fas fa-file-excel"></i> Exportar a Excel
         </a>
 
+        <!--<form action="{{ route('sales.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="file" required>
+            <button type="submit">Importar desde Excel</button>
+        </form>-->
+
+        <!--<div class="alert alert-info text-center">
+            <strong>Formato esperado del archivo:</strong>
+            <br>La primera fila debe contener los encabezados: <code>product_name, quantity, price, sale_date</code>.
+            <br>El archivo debe estar en formato <strong>.xlsx</strong> o <strong>.csv</strong>.
+        </div>-->
+
+        <div class="text-end">
+            <i class="fas fa-question-circle text-primary" 
+               data-bs-toggle="tooltip" 
+               data-bs-placement="top"
+               title="Formato esperado: Encabezados en la primera fila (product_name, quantity, price, sale_date). Archivos en formato .xlsx o .csv.">
+            </i>
+        </div>        
+        
+        <form action="{{ route('sales.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-2">
+                <!--<label for="file" class="form-label">Seleccionar archivo Excel</label>-->
+                <input type="file" class="form-control" name="file" id="file" required>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mb-2">
+                <i class="fas fa-file-import"></i> Importar Datos
+            </button>
+        </form>
+        
+
         <div class="card mb-4">
             <div class="card-header">Ventas Diarias</div>
             <div class="card-body">
@@ -98,4 +130,15 @@
     <div class="d-flex justify-content-center">
         {{ $sales->links() }}
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
 @endsection

@@ -10,6 +10,8 @@ use Maatwebsite\Excel\Facades\Excel;
 Route::resource('sales', SaleController::class);
 
 Route::get('/export-sales', [SaleController::class, 'export'])->name('sales.export');
+Route::post('/import-sales', [SaleController::class, 'import'])->name('sales.import');
+
 
 Route::get('/', function () {
     return view('welcome');

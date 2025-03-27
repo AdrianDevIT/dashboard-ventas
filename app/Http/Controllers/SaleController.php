@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Sale;
 use Illuminate\Pagination\Paginator;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Sale;
+use App\Models\ImportLog;
 use App\Exports\SalesExport;
+use App\Imports\SalesImport;
+
 
 class SaleController extends Controller
 {
@@ -114,5 +117,34 @@ class SaleController extends Controller
     public function export()
     {
         return Excel::download(new SalesExport, 'sales.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,csv',
+            ]);
+
+            $import = new SalesImport();
+            Excel::import($import, $request->file('file'));
+
+            // Guardar en la base de datos
+            ImportLog::create([
+                'file_name' => $request->file('file')->getClientOriginalName(),
+                'total_records' => $import->getRowCount(), // Si SalesImport tiene un método para contar filas
+                'status' => 'success'
+            ]);
+
+            return redirect()->back()->with('success', 'Datos importados correctamente. Total de registros: ' . $import->getRowCount() . '.');
+        } catch (\Exception $e) {
+            ImportLog::create([
+                'file_name' => $request->file('file')->getClientOriginalName(),
+                'status' => 'failed',
+                'error_message' => $e->getMessage()
+            ]);
+
+            return back()->back()->with('error', 'Hubo un error en la importación.');
+        }
     }
 }

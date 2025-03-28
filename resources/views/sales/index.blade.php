@@ -4,6 +4,12 @@
 
 @section('content')
     <div class="container">
+        <h1 class="mb-4">Listado de Ventas</h1>
+
+        @livewire('sales-table')
+    </div>
+
+    <div class="container">
         <h1>Lista de Ventas</h1>
 
         <a href="{{ route('sales.export') }}" class="btn btn-primary mb-2">

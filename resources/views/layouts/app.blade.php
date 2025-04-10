@@ -40,6 +40,28 @@
     @yield('scripts')
 
     @livewireScripts
+
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            const modal = new bootstrap.Modal('#editSaleModal');
+
+            // Abrir modal
+            Livewire.on('openModal', () => {
+                modal.show();
+            });
+
+            // Cerrar modal
+            Livewire.on('closeModal', () => {
+                modal.hide();
+            });
+
+            // Resetear datos al cerrar el modal
+            document.getElementById('editSaleModal').addEventListener('hidden.bs.modal', () => {
+                // Usamos el nombre completo del componente (como está registrado en Livewire)
+                Livewire.dispatchTo('sales-table', 'resetModal');
+            });
+        });
+    </script>
 </body>
 
 </html>
